@@ -1,69 +1,103 @@
-# USB-C Cable Inspector — Android App
+# USB Connector Info App
 
-Detects and displays capabilities of any USB-C cable plugged into your Android phone.
+A Python application that detects USB devices (particularly USB-C cables) and displays detailed information about them when plugged in.
 
-## What It Shows
+## Features
 
-| Category | Details |
-|---|---|
-| **Device Identity** | Manufacturer, product name, vendor/product ID, serial |
-| **USB Standard** | USB 2.0 / 3.0 / 3.1 / USB4, max speed |
-| **Interfaces** | Function classes (audio, storage, HID, etc.) |
-| **Power & Charging** | Current (mA), voltage (mV), estimated wattage, charge type |
-| **Sysfs Data** | Kernel-level speed, bcdUSB version, bMaxPower |
-| **Alternate Modes** | DisplayPort, USB4/Thunderbolt, MHL detection |
-| **Cable Analysis** | Grade inference, e-marker detection, quality notes |
+- **Real-time USB device detection** - Automatically detects when USB devices are connected/disconnected
+- **USB-C specific information** - Displays cable specifications, power delivery capabilities, data transfer speeds
+- **Comprehensive device details** - Vendor ID, Product ID, Serial Number, Manufacturer, Product description
+- **Monitor Mode** - Continuous monitoring of USB bus for device changes
+- **Multi-platform support** - Works on Windows, macOS, and Linux
 
-## ⚠️ Important Limitation
+## Requirements
 
-**Plugging into a charger only** = limited info (charging data only).  
-**Plug into a computer or USB OTG hub** = full USB device info.
+- Python 3.7+
+- `pyusb` - PyUSB library for USB device access
+- `libusb` - Native USB library
 
-This is a fundamental Android/USB limitation — cable e-marker chips are only 
-readable during USB PD negotiation at the hardware level, not by apps.
+## Installation
 
-## Setup
+1. Clone the repository:
+```bash
+git clone https://github.com/vincentmes81-code/Usb_connector.git
+cd Usb_connector
+```
 
-### Requirements
-- Android Studio Hedgehog or newer
-- Android phone running API 26+ (Android 8.0+)
-- A USB-C OTG cable or adapter (to connect to a PC/hub for full data)
+2. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-### Steps
+3. Install libusb (platform-specific):
+   - **Windows**: Download from https://github.com/libusb/libusb/releases
+   - **macOS**: `brew install libusb`
+   - **Linux**: `sudo apt-get install libusb-1.0-0` (Debian/Ubuntu)
 
-1. **Open in Android Studio:**
-   File → Open → select the `USBCableInspector` folder
+## Usage
 
-2. **Sync Gradle** (Android Studio will prompt automatically)
+### Run the app:
+```bash
+python main.py
+```
 
-3. **Run on your device:**
-   - Enable Developer Options on your phone
-   - Enable USB Debugging
-   - Connect phone to PC, select "Run" in Android Studio
+### Options:
+- **`l`** - List all connected USB devices
+- **`m`** - Enter monitoring mode (real-time USB change detection)
+- **`q`** - Quit the application
 
-4. **Test it:**
-   - Plug in any USB-C cable (to a hub, accessory, or computer via OTG adapter)
-   - The app auto-launches and displays all detected info
-   - Or tap "SCAN NOW" at any time
+## How it Works
 
-## How It Works
+The app uses the PyUSB library to:
+1. Enumerate all USB devices connected to the system
+2. Extract detailed information from USB descriptors
+3. Monitor for device connection/disconnection events
+4. Display comprehensive cable and device specifications
 
-- **`UsbManager`** — Android's USB host API, enumerates connected devices
-- **`BatteryManager`** — reads real-time current, voltage, charge status
-- **`/sys/class/typec`** — Linux sysfs, checks for alt mode entries (DP, USB4)
-- **`/sys/bus/usb/devices/`** — sysfs USB device tree for speed, version, power
-- **Broadcast receivers** — auto-detects plug/unplug events in real time
+## Output Example
 
-## File Structure
+When a USB device is detected, you'll see:
 
 ```
-app/src/main/
-├── java/com/usbinspector/
-│   └── MainActivity.kt       ← All logic here
-├── res/
-│   ├── layout/activity_main.xml
-│   ├── values/{colors, strings, themes}.xml
-│   ├── drawable/card_bg.xml
-│   └── xml/device_filter.xml
-└── AndroidManifest.xml
+============================================================
+USB DEVICE DETECTED
+============================================================
+Product:              USB-C Cable
+Manufacturer:         Example Corp
+Serial Number:        ABC123XYZ
+────────────────────────────────────────────────────────────
+Vendor ID:            0x1234
+Product ID:           0x5678
+Bus Number:           1
+Device Number:        2
+────────────────────────────────────────────────────────────
+Device Class:         0 (Miscellaneous)
+Device Subclass:      0x00
+Device Protocol:      0x00
+USB Spec Version:     0x0200
+Device Version:       0x0100
+────────────────────────────────────────────────────────────
+USB Speed:            USB 2.0 (High Speed)
+Max Power:            500mA
+Configurations:       1
+============================================================
 ```
+
+## Supported Information
+
+The app displays the following information for each USB device:
+
+- **Basic Info**: Product name, manufacturer, serial number
+- **Identifiers**: Vendor ID, Product ID, Bus number, Device number
+- **Specifications**: Device class, subclass, protocol
+- **Power**: Maximum power consumption
+- **Speed**: USB version and speed rating
+- **Configuration**: Number of configurations available
+
+## License
+
+MIT
+
+## Author
+
+vincentmes81-code
